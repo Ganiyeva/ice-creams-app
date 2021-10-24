@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { toast } from 'react-toastify';
 
 const Loader = () => {
   return(
@@ -16,13 +17,24 @@ const Loader = () => {
 function Home (){
   const [arr, setArr] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(undefined);
 
     useEffect(() => {
       setTimeout(() => {
-        fetch('http://localhost:8000/menuData').then(res => res.json()).then(data => {
+        fetch('http://localhost:8000/menuData').then(response => {
+          if(!response.ok) {
+              throw Error( 'Server dan ma`lumot olishda xatolik!' + ' ' + response.status);
+          }
+          return response.json();
+      })
+      .then(data => {
           setArr(data);
           setIsLoading(false);
-        });
+        })
+        .catch((err)=> {
+          setIsLoading(false);
+          setError(err.message);
+      });
       }, 3000);
     }, []);
 
@@ -33,7 +45,10 @@ function Home (){
           'Content-Type': 'application/json'
         }
       }).then(() => {
-        console.log(id + " id li post serverdan o`chirildi");
+        toast.error(id + ' id li post serverdan o`chirildi!', {
+          position: "bottom-right",
+          autoClose: 2000
+        });
       });
 
       const newArr = arr.filter((el) => el.id !== id);
@@ -56,7 +71,15 @@ function Home (){
 
     return (
       <section>
-          {isLoading ? <Loader /> : <div className="hom-content"> <div className="container"> <div className="row">{iceList}</div> </div> </div>}
+        {isLoading ? <Loader/> : ''}
+        <div className="hom-content">
+          <div className="container">
+            {error ? <h3>{error}</h3> : ''}
+            <div className="row">
+              {!isLoading && !error ? iceList : ''}
+            </div>
+          </div>
+        </div>
       </section>
     )
 };

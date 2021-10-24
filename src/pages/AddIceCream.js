@@ -1,6 +1,11 @@
 import { useState } from "react/cjs/react.development";
+import { useHistory } from "react-router-dom";
+import { toast } from 'react-toastify';
 
 const AddIceCream = () => {
+  
+  let history = useHistory();
+
   const [image, setImage] = useState(0);
   const [name, setName] = useState('');
   const [count, setCount] = useState(0);
@@ -27,17 +32,18 @@ const AddIceCream = () => {
       },
       body: JSON.stringify(newObj)
     }).then(response => {
-      console.log(JSON.stringify(newObj));
-      console.log("ice cream qo`shildi");
+      toast.success('Post qo`shildi!', {
+        position: "bottom-right",
+        autoClose: 2000
+      });
+      history.push('/');
+    });
 
       setImage('');
       setName('');
       setCount('');
       setPrice('');
       setDescription('');
-    });
-
-    
   };
 
     return (
